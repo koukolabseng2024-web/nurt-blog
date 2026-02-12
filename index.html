@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎀 Hello Kitty Blog</title>
+    <title>🎀 Nurt'un Blog'u</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;600;700&family=Fredoka:wght@300;400;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, orderBy, query, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, collection, getDocs, doc, getDoc, orderBy, query } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         const firebaseConfig = {
           apiKey: "AIzaSyDwfa99kZW0fFbZOy7VMK-9nGojW-clfK8",
@@ -29,13 +29,11 @@
         // Global olarak erişilebilir yap
         window.firebaseDB = db;
         window.firebaseCollection = collection;
-        window.firebaseAddDoc = addDoc;
         window.firebaseGetDocs = getDocs;
         window.firebaseDoc = doc;
         window.firebaseGetDoc = getDoc;
         window.firebaseOrderBy = orderBy;
         window.firebaseQuery = query;
-        window.firebaseTimestamp = Timestamp;
     </script>
     <style>
         * {
@@ -122,6 +120,8 @@
             box-shadow: 0 6px 0 #FF69B4;
             position: relative;
             top: 0;
+            text-decoration: none;
+            display: inline-block;
         }
 
         .nav-btn:hover {
@@ -151,73 +151,6 @@
                 0 0 0 8px #FFE5EC;
             margin-bottom: 30px;
             animation: slideUp 0.5s ease-out;
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-        .form-group label {
-            display: block;
-            font-family: 'Fredoka', sans-serif;
-            font-size: 1.2rem;
-            color: #FF1493;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 15px 20px;
-            border: 3px solid #FFB6C1;
-            border-radius: 20px;
-            font-family: 'Quicksand', sans-serif;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: #FFF5F7;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #FF69B4;
-            background: white;
-            box-shadow: 0 0 0 4px rgba(255, 105, 180, 0.1);
-        }
-
-        .form-group textarea {
-            min-height: 200px;
-            resize: vertical;
-        }
-
-        .btn-submit {
-            font-family: 'Fredoka', sans-serif;
-            background: linear-gradient(135deg, #FF1493 0%, #FF69B4 100%);
-            color: white;
-            border: none;
-            padding: 18px 50px;
-            font-size: 1.3rem;
-            font-weight: 700;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(255, 20, 147, 0.3);
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        .btn-submit:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(255, 20, 147, 0.4);
-        }
-
-        .btn-submit:active {
-            transform: translateY(0);
-        }
-
-        .btn-submit:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
         }
 
         .blog-list {
@@ -319,18 +252,6 @@
             padding: 60px;
         }
 
-        .success-msg {
-            background: linear-gradient(135deg, #FFE5EC 0%, #FFB6C1 100%);
-            color: #D81B60;
-            padding: 20px;
-            border-radius: 20px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            text-align: center;
-            border: 3px solid #FF69B4;
-            animation: slideUp 0.5s ease-out;
-        }
-
         .bow-decoration {
             text-align: center;
             font-size: 4rem;
@@ -399,18 +320,14 @@
         const { useState, useEffect } = React;
 
         function App() {
-            const [page, setPage] = useState('list');
+            const [view, setView] = useState('list'); // 'list' veya 'detail'
             const [blogs, setBlogs] = useState([]);
             const [selectedBlog, setSelectedBlog] = useState(null);
             const [loading, setLoading] = useState(false);
-            const [formData, setFormData] = useState({ title: '', content: '' });
-            const [success, setSuccess] = useState(false);
 
             useEffect(() => {
-                if (page === 'list') {
-                    loadBlogs();
-                }
-            }, [page]);
+                loadBlogs();
+            }, []);
 
             const loadBlogs = async () => {
                 setLoading(true);
@@ -432,33 +349,6 @@
                 setLoading(false);
             };
 
-            const handleSubmit = async (e) => {
-                e.preventDefault();
-                if (!formData.title.trim() || !formData.content.trim()) {
-                    alert('Lütfen tüm alanları doldurun! 🎀');
-                    return;
-                }
-
-                setLoading(true);
-                try {
-                    await window.firebaseAddDoc(
-                        window.firebaseCollection(window.firebaseDB, 'blogs'),
-                        {
-                            title: formData.title,
-                            content: formData.content,
-                            createdAt: window.firebaseTimestamp.now()
-                        }
-                    );
-                    setFormData({ title: '', content: '' });
-                    setSuccess(true);
-                    setTimeout(() => setSuccess(false), 3000);
-                } catch (error) {
-                    console.error('Blog eklenirken hata:', error);
-                    alert('Blog eklenirken hata oluştu. Firebase ayarlarınızı kontrol edin.');
-                }
-                setLoading(false);
-            };
-
             const handleBlogClick = async (blogId) => {
                 setLoading(true);
                 try {
@@ -466,7 +356,7 @@
                     const docSnap = await window.firebaseGetDoc(docRef);
                     if (docSnap.exists()) {
                         setSelectedBlog({ id: docSnap.id, ...docSnap.data() });
-                        setPage('detail');
+                        setView('detail');
                     }
                 } catch (error) {
                     console.error('Blog yüklenirken hata:', error);
@@ -490,95 +380,53 @@
             return (
                 <div className="container">
                     <div className="header">
-                        <h1>🎀 Hello Kitty Blog 🎀</h1>
+                        <h1>🎀 Fatma Nurt'un Blog'u 🎀</h1>
                         <p>Pembe dünyama hoş geldin! ✨</p>
                     </div>
 
-                    {page !== 'detail' && (
-                        <div className="nav">
-                            <button 
-                                className={`nav-btn ${page === 'list' ? 'active' : ''}`}
-                                onClick={() => setPage('list')}
-                            >
-                                📖 Blogları Gör
-                            </button>
-                            <button 
-                                className={`nav-btn ${page === 'create' ? 'active' : ''}`}
-                                onClick={() => setPage('create')}
-                            >
-                                ✍️ Yeni Blog Yaz
-                            </button>
-                        </div>
-                    )}
+                    {view === 'list' && (
+                        <>
+                            <div className="nav">
+                                <a href="index.html" className="nav-btn active">
+                                    📖 Bloglar
+                                </a>
+                            </div>
 
-                    {page === 'create' && (
-                        <div className="card">
-                            <div className="bow-decoration">🎀</div>
-                            {success && (
-                                <div className="success-msg">
-                                    ✨ Blogun başarıyla eklendi! Çok güzel oldu! 🎀
-                                </div>
-                            )}
-                            <form onSubmit={handleSubmit}>
-                                <div className="form-group">
-                                    <label>Blog Başlığı</label>
-                                    <input
-                                        type="text"
-                                        placeholder="Başlığını yaz..."
-                                        value={formData.title}
-                                        onChange={(e) => setFormData({...formData, title: e.target.value})}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Blog İçeriği</label>
-                                    <textarea
-                                        placeholder="Neler yazmak istersin?..."
-                                        value={formData.content}
-                                        onChange={(e) => setFormData({...formData, content: e.target.value})}
-                                    />
-                                </div>
-                                <button type="submit" className="btn-submit" disabled={loading}>
-                                    {loading ? '💝 Kaydediliyor...' : '💝 Blogu Kaydet'}
-                                </button>
-                            </form>
-                        </div>
-                    )}
-
-                    {page === 'list' && (
-                        <div>
-                            {loading ? (
-                                <div className="loading">💝 Bloglar yükleniyor...</div>
-                            ) : blogs.length === 0 ? (
-                                <div className="empty">
-                                    <div className="bow-decoration">🎀</div>
-                                    <p>Henüz blog yok! Hadi ilkini sen yaz! ✨</p>
-                                </div>
-                            ) : (
-                                <div className="blog-list">
-                                    {blogs.map(blog => (
-                                        <div 
-                                            key={blog.id} 
-                                            className="blog-item"
-                                            onClick={() => handleBlogClick(blog.id)}
-                                        >
-                                            <h3>{blog.title}</h3>
-                                            <div className="date">📅 {formatDate(blog.createdAt)}</div>
-                                            <div className="preview">
-                                                {blog.content.substring(0, 150)}...
+                            <div>
+                                {loading ? (
+                                    <div className="loading">💝 Bloglar yükleniyor...</div>
+                                ) : blogs.length === 0 ? (
+                                    <div className="empty">
+                                        <div className="bow-decoration">🎀</div>
+                                        <p>Henüz blog yok! Hadi ilkini sen yaz! ✨</p>
+                                    </div>
+                                ) : (
+                                    <div className="blog-list">
+                                        {blogs.map(blog => (
+                                            <div 
+                                                key={blog.id} 
+                                                className="blog-item"
+                                                onClick={() => handleBlogClick(blog.id)}
+                                            >
+                                                <h3>{blog.title}</h3>
+                                                <div className="date">📅 {formatDate(blog.createdAt)}</div>
+                                                <div className="preview">
+                                                    {blog.content.substring(0, 150)}...
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </>
                     )}
 
-                    {page === 'detail' && selectedBlog && (
+                    {view === 'detail' && selectedBlog && (
                         <div className="card blog-detail">
                             <button 
                                 className="back-btn"
                                 onClick={() => {
-                                    setPage('list');
+                                    setView('list');
                                     setSelectedBlog(null);
                                 }}
                             >
