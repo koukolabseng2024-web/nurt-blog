@@ -22,11 +22,9 @@
           measurementId: "G-15YMV04V6J"
         };
 
-        // Firebase'i başlat
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Global olarak erişilebilir yap
         window.firebaseDB = db;
         window.firebaseCollection = collection;
         window.firebaseGetDocs = getDocs;
@@ -153,6 +151,7 @@
             animation: slideUp 0.5s ease-out;
         }
 
+        /* --- Blog Listesi --- */
         .blog-list {
             display: grid;
             gap: 25px;
@@ -161,7 +160,7 @@
         .blog-item {
             background: white;
             border-radius: 25px;
-            padding: 30px;
+            overflow: hidden;
             box-shadow: 0 8px 20px rgba(255, 105, 180, 0.15);
             cursor: pointer;
             transition: all 0.3s ease;
@@ -174,17 +173,30 @@
             border-color: #FFB6C1;
         }
 
+        /* Thumbnail fotoğrafı */
+        .blog-item-thumbnail {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+            border-bottom: 3px solid #FFE5EC;
+        }
+
+        .blog-item-body {
+            padding: 25px 30px 30px;
+        }
+
         .blog-item h3 {
             font-family: 'Fredoka', sans-serif;
             color: #FF1493;
             font-size: 1.8rem;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .blog-item .date {
             color: #FF69B4;
             font-size: 0.9rem;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             font-weight: 600;
         }
 
@@ -194,6 +206,7 @@
             font-size: 1.05rem;
         }
 
+        /* --- Blog Detayı --- */
         .blog-detail h2 {
             font-family: 'Fredoka', sans-serif;
             color: #FF1493;
@@ -207,6 +220,17 @@
             font-size: 1rem;
             margin-bottom: 30px;
             font-weight: 600;
+        }
+
+        /* Detay sayfasındaki fotoğraf */
+        .blog-detail-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 20px;
+            border: 3px solid #FFE5EC;
+            margin-bottom: 30px;
+            display: block;
         }
 
         .blog-detail .content {
@@ -260,55 +284,27 @@
         }
 
         @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.3) rotate(-10deg);
-            }
-            50% {
-                transform: scale(1.05) rotate(2deg);
-            }
-            70% {
-                transform: scale(0.9) rotate(-1deg);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) rotate(0);
-            }
+            0% { opacity: 0; transform: scale(0.3) rotate(-10deg); }
+            50% { transform: scale(1.05) rotate(2deg); }
+            70% { transform: scale(0.9) rotate(-1deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0); }
         }
 
         @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
 
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2.5rem;
-            }
-            
-            .card {
-                padding: 25px;
-            }
-            
-            .nav-btn {
-                padding: 12px 25px;
-                font-size: 1rem;
-            }
+            .header h1 { font-size: 2.5rem; }
+            .card { padding: 25px; }
+            .nav-btn { padding: 12px 25px; font-size: 1rem; }
+            .blog-detail h2 { font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -320,7 +316,7 @@
         const { useState, useEffect } = React;
 
         function App() {
-            const [view, setView] = useState('list'); // 'list' veya 'detail'
+            const [view, setView] = useState('list');
             const [blogs, setBlogs] = useState([]);
             const [selectedBlog, setSelectedBlog] = useState(null);
             const [loading, setLoading] = useState(false);
@@ -357,6 +353,7 @@
                     if (docSnap.exists()) {
                         setSelectedBlog({ id: docSnap.id, ...docSnap.data() });
                         setView('detail');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
                 } catch (error) {
                     console.error('Blog yüklenirken hata:', error);
@@ -384,41 +381,54 @@
                         <p>Pembe dünyama hoş geldin! ✨</p>
                     </div>
 
+                    {/* Liste Görünümü */}
                     {view === 'list' && (
                         <>
                             <div className="nav">
-                                <a href="index.html" className="nav-btn active">
-                                    📖 Bloglar
-                                </a>
+                                <a href="index.html" className="nav-btn active">📖 Bloglar</a>
                             </div>
 
-                            <div>
-                                {loading ? (
-                                    <div className="loading">💝 Bloglar yükleniyor...</div>
-                                ) : (
-                                    <div className="blog-list">
-                                        {blogs.map(blog => (
-                                            <div 
-                                                key={blog.id} 
-                                                className="blog-item"
-                                                onClick={() => handleBlogClick(blog.id)}
-                                            >
+                            {loading ? (
+                                <div className="loading">💝 Bloglar yükleniyor...</div>
+                            ) : blogs.length === 0 ? (
+                                <div className="empty">
+                                    Henüz blog yok. İlk blogu yaz! 🎀<br/>
+                                    <a href="create-blog.html" style={{color:'#FF1493', fontWeight:700}}>→ Yeni blog yaz</a>
+                                </div>
+                            ) : (
+                                <div className="blog-list">
+                                    {blogs.map(blog => (
+                                        <div
+                                            key={blog.id}
+                                            className="blog-item"
+                                            onClick={() => handleBlogClick(blog.id)}
+                                        >
+                                            {/* Fotoğraf varsa thumbnail göster */}
+                                            {blog.imageUrl && (
+                                                <img
+                                                    src={blog.imageUrl}
+                                                    alt={blog.title}
+                                                    className="blog-item-thumbnail"
+                                                />
+                                            )}
+                                            <div className="blog-item-body">
                                                 <h3>{blog.title}</h3>
                                                 <div className="date">📅 {formatDate(blog.createdAt)}</div>
                                                 <div className="preview">
-                                                    {blog.content.substring(0, 150)}...
+                                                    {blog.content.substring(0, 150)}{blog.content.length > 150 ? '...' : ''}
                                                 </div>
                                             </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </>
                     )}
 
+                    {/* Detay Görünümü */}
                     {view === 'detail' && selectedBlog && (
                         <div className="card blog-detail">
-                            <button 
+                            <button
                                 className="back-btn"
                                 onClick={() => {
                                     setView('list');
@@ -427,9 +437,21 @@
                             >
                                 ← Geri Dön
                             </button>
+
                             <div className="bow-decoration">🎀</div>
+
                             <h2>{selectedBlog.title}</h2>
                             <div className="date">📅 {formatDate(selectedBlog.createdAt)}</div>
+
+                            {/* Fotoğraf varsa detayda göster */}
+                            {selectedBlog.imageUrl && (
+                                <img
+                                    src={selectedBlog.imageUrl}
+                                    alt={selectedBlog.title}
+                                    className="blog-detail-image"
+                                />
+                            )}
+
                             <div className="content">{selectedBlog.content}</div>
                         </div>
                     )}
