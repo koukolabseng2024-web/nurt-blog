@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎀 Nurt'un Blog'u</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;600;700&family=Fredoka:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>🍄 Nurt'un Blog'u - Super Mario Dünyası</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -22,11 +22,9 @@
           measurementId: "G-15YMV04V6J"
         };
 
-        // Firebase'i başlat
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Global olarak erişilebilir yap
         window.firebaseDB = db;
         window.firebaseCollection = collection;
         window.firebaseGetDocs = getDocs;
@@ -36,38 +34,136 @@
         window.firebaseQuery = query;
     </script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --mario-red: #E52521;
+            --mario-blue: #049CD8;
+            --mario-yellow: #FBD000;
+            --mario-green: #43B047;
+            --mario-brown: #8B4513;
+            --mario-dark: #1A1A2E;
+            --mario-sky: #5C94FC;
+            --mario-ground: #C84B0C;
+            --mario-brick: #C84B0C;
+            --mario-white: #F8F8F8;
+            --mario-orange: #F28C0F;
+            --coin-gold: #FFD700;
+            --shadow-pixel: 4px 4px 0px #000;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html { image-rendering: pixelated; }
 
         body {
-            font-family: 'Quicksand', sans-serif;
-            background: linear-gradient(135deg, #FFE5EC 0%, #FFC2D1 50%, #FFB3C6 100%);
+            font-family: 'Press Start 2P', monospace;
+            background-color: var(--mario-sky);
             min-height: 100vh;
-            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
         }
 
-        .kitty-pattern {
+        /* Sky background with clouds */
+        .sky-bg {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.05;
-            pointer-events: none;
-            background-image: 
-                radial-gradient(circle at 20% 30%, #FF69B4 2px, transparent 2px),
-                radial-gradient(circle at 60% 70%, #FF1493 2px, transparent 2px),
-                radial-gradient(circle at 80% 20%, #FFB6C1 2px, transparent 2px);
-            background-size: 100px 100px;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(180deg, #5C94FC 0%, #80B4FC 60%, #C8E4FF 100%);
             z-index: 0;
+        }
+
+        /* Animated clouds */
+        .cloud {
+            position: fixed;
+            background: white;
+            border-radius: 0;
+            z-index: 1;
+            animation: cloudFloat linear infinite;
+            image-rendering: pixelated;
+        }
+        .cloud::before, .cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+        }
+        /* Pixel cloud shapes */
+        .cloud-1 { width: 64px; height: 24px; top: 10%; animation-duration: 40s; animation-delay: 0s; }
+        .cloud-1::before { width: 32px; height: 16px; top: -16px; left: 8px; }
+        .cloud-1::after { width: 48px; height: 16px; top: -8px; left: 4px; }
+
+        .cloud-2 { width: 80px; height: 24px; top: 25%; animation-duration: 55s; animation-delay: -20s; }
+        .cloud-2::before { width: 40px; height: 16px; top: -16px; left: 12px; }
+        .cloud-2::after { width: 56px; height: 16px; top: -8px; left: 6px; }
+
+        .cloud-3 { width: 48px; height: 24px; top: 15%; animation-duration: 45s; animation-delay: -10s; }
+        .cloud-3::before { width: 24px; height: 16px; top: -16px; left: 6px; }
+        .cloud-3::after { width: 36px; height: 16px; top: -8px; left: 3px; }
+
+        @keyframes cloudFloat {
+            from { transform: translateX(110vw); }
+            to { transform: translateX(-200px); }
+        }
+
+        /* Ground blocks at bottom */
+        .ground-bar {
+            position: fixed;
+            bottom: 0; left: 0;
+            width: 100%; height: 48px;
+            background: var(--mario-green);
+            border-top: 8px solid #2D7A30;
+            z-index: 2;
+            display: flex;
+            align-items: flex-start;
+        }
+        .ground-bar::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 8px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--mario-ground) 0px, var(--mario-ground) 32px,
+                #A83800 32px, #A83800 34px,
+                var(--mario-ground) 34px, var(--mario-ground) 64px
+            );
+        }
+
+        /* Floating blocks decoration */
+        .deco-blocks {
+            position: fixed;
+            bottom: 48px;
+            width: 100%;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .q-block {
+            display: inline-block;
+            width: 40px; height: 40px;
+            background: var(--mario-yellow);
+            border: 4px solid #000;
+            box-shadow: inset -4px -4px 0 #8B6914, inset 4px 4px 0 #FFE860;
+            position: absolute;
+            font-size: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: #8B6914;
+            font-family: 'Press Start 2P', monospace;
+            font-weight: bold;
+            animation: blockBounce 1s ease-in-out infinite;
+        }
+        .q-block:nth-child(1) { left: 5%; animation-delay: 0s; }
+        .q-block:nth-child(2) { left: 25%; animation-delay: 0.3s; }
+        .q-block:nth-child(3) { left: 50%; animation-delay: 0.6s; }
+        .q-block:nth-child(4) { left: 75%; animation-delay: 0.9s; }
+        .q-block:nth-child(5) { left: 90%; animation-delay: 1.2s; }
+
+        @keyframes blockBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
         }
 
         #root {
             position: relative;
-            z-index: 1;
+            z-index: 10;
+            padding: 20px 20px 80px;
         }
 
         .container {
@@ -75,259 +171,431 @@
             margin: 0 auto;
         }
 
+        /* HEADER */
         .header {
             text-align: center;
             margin-bottom: 40px;
-            animation: bounceIn 0.8s ease-out;
+            animation: headerDrop 0.6s cubic-bezier(0.36, 0, 0.66, -0.56) forwards;
+            animation-delay: 0.1s;
+            opacity: 0;
+        }
+        @keyframes headerDrop {
+            0% { transform: translateY(-80px); opacity: 0; }
+            80% { transform: translateY(10px); opacity: 1; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        .mario-flag {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
         }
 
         .header h1 {
-            font-family: 'Fredoka', sans-serif;
-            font-size: 3.5rem;
-            color: #FF1493;
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(1rem, 3.5vw, 1.8rem);
+            color: var(--mario-white);
             text-shadow: 
-                3px 3px 0px #FFB6C1,
-                6px 6px 0px rgba(255, 105, 180, 0.3);
-            margin-bottom: 10px;
+                4px 4px 0 #000,
+                8px 8px 0 rgba(0,0,0,0.3);
+            line-height: 1.5;
             letter-spacing: 2px;
         }
 
-        .header p {
-            font-size: 1.2rem;
-            color: #D81B60;
-            font-weight: 600;
+        .header-sub {
+            font-family: 'VT323', monospace;
+            font-size: 1.8rem;
+            color: var(--mario-yellow);
+            text-shadow: 3px 3px 0 #000;
+            margin-top: 10px;
+            letter-spacing: 3px;
         }
 
+        /* Score/lives bar */
+        .hud-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.7);
+            border: 4px solid #000;
+            border-radius: 0;
+            padding: 12px 20px;
+            margin-bottom: 30px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.55rem;
+            color: white;
+            flex-wrap: wrap;
+            gap: 10px;
+            box-shadow: var(--shadow-pixel);
+        }
+        .hud-item { display: flex; flex-direction: column; gap: 4px; }
+        .hud-label { color: var(--mario-yellow); }
+        .hud-value { color: white; }
+
+        .coin-icon {
+            display: inline-block;
+            width: 12px; height: 16px;
+            background: var(--coin-gold);
+            border: 2px solid #000;
+            border-radius: 50%;
+            vertical-align: middle;
+            margin-right: 4px;
+            animation: coinSpin 1s steps(4) infinite;
+        }
+        @keyframes coinSpin {
+            0% { transform: scaleX(1); }
+            25% { transform: scaleX(0.5); }
+            50% { transform: scaleX(0.1); }
+            75% { transform: scaleX(0.5); }
+            100% { transform: scaleX(1); }
+        }
+
+        /* NAV */
         .nav {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             justify-content: center;
-            margin-bottom: 40px;
+            margin-bottom: 35px;
             flex-wrap: wrap;
         }
 
         .nav-btn {
-            font-family: 'Fredoka', sans-serif;
-            background: white;
-            border: 4px solid #FF69B4;
-            padding: 15px 35px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #FF1493;
-            border-radius: 50px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.55rem;
+            padding: 14px 20px;
+            border: 4px solid #000;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 0 #FF69B4;
-            position: relative;
-            top: 0;
+            color: white;
             text-decoration: none;
             display: inline-block;
+            transition: transform 0.1s, box-shadow 0.1s;
+            position: relative;
+            top: 0;
+            line-height: 1.6;
         }
-
+        .nav-btn-red {
+            background: var(--mario-red);
+            box-shadow: 0 6px 0 #8B1410, var(--shadow-pixel);
+        }
+        .nav-btn-green {
+            background: var(--mario-green);
+            box-shadow: 0 6px 0 #2D7A30, var(--shadow-pixel);
+        }
+        .nav-btn-blue {
+            background: var(--mario-blue);
+            box-shadow: 0 6px 0 #025A85, var(--shadow-pixel);
+        }
         .nav-btn:hover {
-            background: #FF69B4;
-            color: white;
             transform: translateY(-3px);
-            box-shadow: 0 9px 0 #D81B60;
         }
-
         .nav-btn:active {
             top: 4px;
-            box-shadow: 0 2px 0 #D81B60;
+            box-shadow: 0 2px 0 #000 !important;
         }
-
         .nav-btn.active {
-            background: #FF1493;
-            color: white;
-            border-color: #D81B60;
+            background: var(--mario-yellow);
+            color: #000;
+            box-shadow: 0 6px 0 #8B6914, var(--shadow-pixel);
         }
 
-        .card {
-            background: white;
-            border-radius: 30px;
-            padding: 40px;
-            box-shadow: 
-                0 10px 30px rgba(255, 20, 147, 0.2),
-                0 0 0 8px #FFE5EC;
-            margin-bottom: 30px;
-            animation: slideUp 0.5s ease-out;
-        }
-
+        /* BLOG LIST */
         .blog-list {
             display: grid;
-            gap: 25px;
+            gap: 20px;
         }
 
         .blog-item {
-            background: white;
-            border-radius: 25px;
-            padding: 30px;
-            box-shadow: 0 8px 20px rgba(255, 105, 180, 0.15);
+            background: var(--mario-white);
+            border: 4px solid #000;
+            box-shadow: 6px 6px 0 #000;
+            padding: 0;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: 3px solid transparent;
+            transition: transform 0.1s, box-shadow 0.1s;
+            overflow: hidden;
+            animation: slideInRight 0.4s ease-out both;
+        }
+        .blog-item:nth-child(1) { animation-delay: 0.05s; }
+        .blog-item:nth-child(2) { animation-delay: 0.1s; }
+        .blog-item:nth-child(3) { animation-delay: 0.15s; }
+        .blog-item:nth-child(4) { animation-delay: 0.2s; }
+        .blog-item:nth-child(5) { animation-delay: 0.25s; }
+
+        @keyframes slideInRight {
+            from { transform: translateX(-40px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         .blog-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(255, 20, 147, 0.25);
-            border-color: #FFB6C1;
+            transform: translate(-3px, -3px);
+            box-shadow: 9px 9px 0 #000;
+        }
+        .blog-item:active {
+            transform: translate(2px, 2px);
+            box-shadow: 4px 4px 0 #000;
         }
 
+        .blog-item-header {
+            background: var(--mario-red);
+            padding: 12px 20px;
+            border-bottom: 4px solid #000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .blog-item-number {
+            background: var(--mario-yellow);
+            color: #000;
+            border: 3px solid #000;
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.65rem;
+            flex-shrink: 0;
+        }
         .blog-item h3 {
-            font-family: 'Fredoka', sans-serif;
-            color: #FF1493;
-            font-size: 1.8rem;
-            margin-bottom: 12px;
+            font-family: 'Press Start 2P', monospace;
+            color: white;
+            font-size: clamp(0.55rem, 1.5vw, 0.75rem);
+            text-shadow: 2px 2px 0 #000;
+            line-height: 1.5;
         }
 
-        .blog-item .date {
-            color: #FF69B4;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-            font-weight: 600;
+        .blog-item-body { padding: 15px 20px; }
+
+        .blog-date {
+            font-family: 'VT323', monospace;
+            font-size: 1.1rem;
+            color: var(--mario-ground);
+            margin-bottom: 8px;
+            display: flex; align-items: center; gap: 6px;
         }
 
-        .blog-item .preview {
-            color: #666;
+        .blog-preview {
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        .blog-item-footer {
+            background: #F0E8D8;
+            border-top: 3px solid #ccc;
+            padding: 8px 20px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 6px;
+        }
+        .read-more-label {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.5rem;
+            color: var(--mario-blue);
+        }
+        .arrow-pixel {
+            font-size: 0.8rem;
+            color: var(--mario-blue);
+            animation: arrowBlink 0.8s steps(2) infinite;
+        }
+        @keyframes arrowBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* DETAIL VIEW */
+        .blog-detail-card {
+            background: var(--mario-white);
+            border: 4px solid #000;
+            box-shadow: 8px 8px 0 #000;
+            overflow: hidden;
+            animation: popIn 0.3s ease-out;
+        }
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            80% { transform: scale(1.03); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .detail-header {
+            background: linear-gradient(180deg, var(--mario-blue) 0%, #025A85 100%);
+            padding: 25px;
+            border-bottom: 4px solid #000;
+            position: relative;
+            overflow: hidden;
+        }
+        .detail-header::before {
+            content: '★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★';
+            position: absolute;
+            top: 5px; left: 0;
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.2);
+            letter-spacing: 8px;
+            white-space: nowrap;
+        }
+
+        .detail-header h2 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(0.7rem, 2vw, 1.1rem);
+            color: white;
+            text-shadow: 3px 3px 0 #000;
             line-height: 1.6;
-            font-size: 1.05rem;
+            margin-top: 8px;
+        }
+        .detail-date {
+            font-family: 'VT323', monospace;
+            font-size: 1.3rem;
+            color: var(--mario-yellow);
+            margin-bottom: 10px;
         }
 
-        .blog-detail h2 {
-            font-family: 'Fredoka', sans-serif;
-            color: #FF1493;
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            line-height: 1.3;
+        .detail-body {
+            padding: 30px 25px;
         }
-
-        .blog-detail .date {
-            color: #FF69B4;
-            font-size: 1rem;
-            margin-bottom: 30px;
-            font-weight: 600;
-        }
-
-        .blog-detail .content {
+        .detail-content {
+            font-family: 'VT323', monospace;
+            font-size: 1.35rem;
             color: #333;
             line-height: 1.8;
-            font-size: 1.1rem;
             white-space: pre-wrap;
         }
 
         .back-btn {
-            font-family: 'Fredoka', sans-serif;
-            background: white;
-            border: 3px solid #FFB6C1;
-            padding: 12px 30px;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #FF1493;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 25px;
-            display: inline-block;
-        }
-
-        .back-btn:hover {
-            background: #FFB6C1;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.55rem;
+            background: var(--mario-orange);
             color: white;
+            border: 4px solid #000;
+            box-shadow: 5px 5px 0 #000;
+            padding: 12px 18px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 25px;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
+        .back-btn:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 #000; }
+        .back-btn:active { transform: translate(2px, 2px); box-shadow: 3px 3px 0 #000; }
 
-        .loading {
+        /* LOADING / EMPTY */
+        .loading-screen {
             text-align: center;
-            color: #FF1493;
-            font-size: 1.5rem;
-            font-family: 'Fredoka', sans-serif;
-            padding: 60px;
+            padding: 60px 20px;
+            background: rgba(0,0,0,0.7);
+            border: 4px solid #000;
+            box-shadow: var(--shadow-pixel);
+        }
+        .loading-mario {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 20px;
+            animation: runMario 0.4s steps(2) infinite;
+        }
+        @keyframes runMario {
+            0% { transform: translateX(-5px); }
+            100% { transform: translateX(5px); }
+        }
+        .loading-text {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.65rem;
+            color: var(--mario-yellow);
+            animation: blink 1s steps(2) infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
         }
 
-        .empty {
+        .empty-screen {
             text-align: center;
-            color: #FF69B4;
-            font-size: 1.3rem;
-            font-family: 'Fredoka', sans-serif;
-            padding: 60px;
+            padding: 60px 20px;
+            background: rgba(0,0,0,0.7);
+            border: 4px solid #000;
+            box-shadow: var(--shadow-pixel);
+        }
+        .empty-text {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.7rem;
+            color: white;
+            line-height: 2;
         }
 
-        .bow-decoration {
+        /* MARIO character decoration */
+        .mario-deco {
             text-align: center;
-            font-size: 4rem;
-            margin: 20px 0;
-            animation: float 3s ease-in-out infinite;
+            font-size: 2.5rem;
+            margin: 15px 0;
+            animation: marioRun 0.3s steps(2) infinite alternate;
+        }
+        @keyframes marioRun {
+            0% { letter-spacing: 0px; }
+            100% { letter-spacing: 4px; }
         }
 
-        @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.3) rotate(-10deg);
-            }
-            50% {
-                transform: scale(1.05) rotate(2deg);
-            }
-            70% {
-                transform: scale(0.9) rotate(-1deg);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1) rotate(0);
-            }
+        /* Pipe decoration */
+        .pipe-row {
+            display: flex;
+            align-items: flex-end;
+            gap: 0;
+            height: 60px;
+            margin-bottom: 20px;
+            pointer-events: none;
+        }
+        .pipe {
+            width: 40px; 
+            display: flex;
+            flex-direction: column;
+            margin-right: 20px;
+        }
+        .pipe-top {
+            width: 48px; height: 14px;
+            background: #2DB840;
+            border: 3px solid #000;
+            margin-left: -4px;
+        }
+        .pipe-body {
+            width: 40px; height: 40px;
+            background: #43B047;
+            border: 3px solid #000;
+            border-top: none;
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2.5rem;
-            }
-            
-            .card {
-                padding: 25px;
-            }
-            
-            .nav-btn {
-                padding: 12px 25px;
-                font-size: 1rem;
-            }
+        /* Responsive */
+        @media (max-width: 640px) {
+            .hud-bar { font-size: 0.45rem; padding: 10px 12px; }
+            .blog-item-header { padding: 10px 14px; }
+            .blog-item-body { padding: 12px 14px; }
+            .detail-header { padding: 18px; }
+            .detail-body { padding: 20px 15px; }
         }
     </style>
 </head>
 <body>
-    <div class="kitty-pattern"></div>
+    <div class="sky-bg"></div>
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="ground-bar"></div>
+    <div class="deco-blocks">
+        <div class="q-block">?</div>
+        <div class="q-block">?</div>
+        <div class="q-block">?</div>
+        <div class="q-block">?</div>
+        <div class="q-block">?</div>
+    </div>
+
     <div id="root"></div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
         function App() {
-            const [view, setView] = useState('list'); // 'list' veya 'detail'
+            const [view, setView] = useState('list');
             const [blogs, setBlogs] = useState([]);
             const [selectedBlog, setSelectedBlog] = useState(null);
             const [loading, setLoading] = useState(false);
 
-            useEffect(() => {
-                loadBlogs();
-            }, []);
+            useEffect(() => { loadBlogs(); }, []);
 
             const loadBlogs = async () => {
                 setLoading(true);
@@ -336,15 +604,13 @@
                         window.firebaseCollection(window.firebaseDB, 'blogs'),
                         window.firebaseOrderBy('createdAt', 'desc')
                     );
-                    const querySnapshot = await window.firebaseGetDocs(q);
-                    const blogsData = [];
-                    querySnapshot.forEach((doc) => {
-                        blogsData.push({ id: doc.id, ...doc.data() });
-                    });
-                    setBlogs(blogsData);
-                } catch (error) {
-                    console.error('Blog yüklenirken hata:', error);
-                    alert('Bloglar yüklenirken hata oluştu. Firebase ayarlarınızı kontrol edin.');
+                    const snap = await window.firebaseGetDocs(q);
+                    const data = [];
+                    snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+                    setBlogs(data);
+                } catch (err) {
+                    console.error(err);
+                    alert('Bloglar yüklenirken hata oluştu!');
                 }
                 setLoading(false);
             };
@@ -352,87 +618,129 @@
             const handleBlogClick = async (blogId) => {
                 setLoading(true);
                 try {
-                    const docRef = window.firebaseDoc(window.firebaseDB, 'blogs', blogId);
-                    const docSnap = await window.firebaseGetDoc(docRef);
-                    if (docSnap.exists()) {
-                        setSelectedBlog({ id: docSnap.id, ...docSnap.data() });
+                    const ref = window.firebaseDoc(window.firebaseDB, 'blogs', blogId);
+                    const snap = await window.firebaseGetDoc(ref);
+                    if (snap.exists()) {
+                        setSelectedBlog({ id: snap.id, ...snap.data() });
                         setView('detail');
                     }
-                } catch (error) {
-                    console.error('Blog yüklenirken hata:', error);
-                    alert('Blog yüklenirken hata oluştu.');
+                } catch (err) {
+                    console.error(err);
+                    alert('Blog yüklenirken hata oluştu!');
                 }
                 setLoading(false);
             };
 
-            const formatDate = (timestamp) => {
-                if (!timestamp) return '';
-                const date = timestamp.toDate();
-                return date.toLocaleDateString('tr-TR', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
+            const formatDate = (ts) => {
+                if (!ts) return '';
+                return ts.toDate().toLocaleDateString('tr-TR', {
+                    year: 'numeric', month: 'long', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
                 });
             };
 
             return (
                 <div className="container">
+                    {/* Header */}
                     <div className="header">
-                        <h1>🎀 Fatma Nurt'un Blog'u 🎀</h1>
-                        <p>Pembe dünyama hoş geldin! ✨</p>
+                        <div className="mario-deco">🍄 ⭐ 🎮 ⭐ 🍄</div>
+                        <h1>FATMA NURT'UN<br/>BLOG DÜNYASI</h1>
+                        <div className="header-sub">▶ WORLD 1-1 ◀</div>
                     </div>
 
+                    {/* HUD bar */}
+                    <div className="hud-bar">
+                        <div className="hud-item">
+                            <div className="hud-label">PLAYER</div>
+                            <div className="hud-value">NURT</div>
+                        </div>
+                        <div className="hud-item">
+                            <div className="hud-label">KOIN</div>
+                            <div className="hud-value"><span className="coin-icon"></span>x{blogs.length > 9 ? blogs.length : '0' + blogs.length}</div>
+                        </div>
+                        <div className="hud-item">
+                            <div className="hud-label">DÜNYA</div>
+                            <div className="hud-value">1-1</div>
+                        </div>
+                        <div className="hud-item">
+                            <div className="hud-label">ZAMAN</div>
+                            <div className="hud-value">∞</div>
+                        </div>
+                    </div>
+
+                    {/* Nav */}
+                    <div className="nav">
+                        <a href="index.html" className="nav-btn nav-btn-yellow active">
+                            📖 BLOGLAR
+                        </a>
+                    </div>
+
+                    {/* LIST VIEW */}
                     {view === 'list' && (
                         <>
-                            <div className="nav">
-                                <a href="index.html" className="nav-btn active">
-                                    📖 Bloglar
-                                </a>
-                            </div>
-
-                            <div>
-                                {loading ? (
-                                    <div className="loading">💝 Bloglar yükleniyor...</div>
-                                ) : (
-                                    <div className="blog-list">
-                                        {blogs.map(blog => (
-                                            <div 
-                                                key={blog.id} 
-                                                className="blog-item"
-                                                onClick={() => handleBlogClick(blog.id)}
-                                            >
+                            {loading ? (
+                                <div className="loading-screen">
+                                    <span className="loading-mario">🍄</span>
+                                    <div className="loading-text">YÜKLENİYOR...</div>
+                                </div>
+                            ) : blogs.length === 0 ? (
+                                <div className="empty-screen">
+                                    <div style={{fontSize:'3rem', marginBottom:'20px'}}>❓</div>
+                                    <div className="empty-text">HİÇ BLOG YOK!<br/>YENİ BİR MACERA YARAT!</div>
+                                </div>
+                            ) : (
+                                <div className="blog-list">
+                                    {blogs.map((blog, i) => (
+                                        <div
+                                            key={blog.id}
+                                            className="blog-item"
+                                            onClick={() => handleBlogClick(blog.id)}
+                                        >
+                                            <div className="blog-item-header">
+                                                <div className="blog-item-number">{String(i+1).padStart(2,'0')}</div>
                                                 <h3>{blog.title}</h3>
-                                                <div className="date">📅 {formatDate(blog.createdAt)}</div>
-                                                <div className="preview">
-                                                    {blog.content.substring(0, 150)}...
+                                            </div>
+                                            <div className="blog-item-body">
+                                                <div className="blog-date">
+                                                    🕐 {formatDate(blog.createdAt)}
+                                                </div>
+                                                <div className="blog-preview">
+                                                    {blog.content.substring(0, 160)}...
                                                 </div>
                                             </div>
-                                        ))}
-                                    </div>
-                                )}
+                                            <div className="blog-item-footer">
+                                                <span className="read-more-label">DEVAMINI OKU</span>
+                                                <span className="arrow-pixel">▶▶</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </>
+                    )}
+
+                    {/* DETAIL VIEW */}
+                    {view === 'detail' && selectedBlog && (
+                        <>
+                            <button className="back-btn" onClick={() => { setView('list'); setSelectedBlog(null); }}>
+                                ◀ GERİ DÖN
+                            </button>
+                            <div className="blog-detail-card">
+                                <div className="detail-header">
+                                    <div className="detail-date">🕐 {formatDate(selectedBlog.createdAt)}</div>
+                                    <h2>{selectedBlog.title}</h2>
+                                </div>
+                                <div className="detail-body">
+                                    <div className="detail-content">{selectedBlog.content}</div>
+                                </div>
                             </div>
                         </>
                     )}
 
-                    {view === 'detail' && selectedBlog && (
-                        <div className="card blog-detail">
-                            <button 
-                                className="back-btn"
-                                onClick={() => {
-                                    setView('list');
-                                    setSelectedBlog(null);
-                                }}
-                            >
-                                ← Geri Dön
-                            </button>
-                            <div className="bow-decoration">🎀</div>
-                            <h2>{selectedBlog.title}</h2>
-                            <div className="date">📅 {formatDate(selectedBlog.createdAt)}</div>
-                            <div className="content">{selectedBlog.content}</div>
-                        </div>
-                    )}
+                    {/* Mario deco footer */}
+                    <div style={{textAlign:'center', marginTop:'30px', fontSize:'1.5rem', opacity:0.5}}>
+                        🍄 ⭐ 🪙 ⭐ 🍄
+                    </div>
                 </div>
             );
         }
